@@ -19,29 +19,44 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+func roundToTwoDecimal(num float64) float64 {
+	return float64(int(num*100)) / 100
+}
+
 func handleSystemInfo(conn *websocket.Conn) {
 	defer conn.Close()
 	cpuCount, _ := cpu.Counts(true)
 	for {
-		cpuPercent, _ := cpu.Percent(time.Second, false)
+		cpuPercent, _ := cpu.Percent(time.Second, true) // change to true to get per core CPU usage
+		cpuUtilization := make([]map[string]interface{}, len(cpuPercent))
+		for i, val := range cpuPercent {
+			cpuUtilization[i] = map[string]interface{}{
+				"number":  i,
+				"percent": roundToTwoDecimal(val),
+			}
+		}
+		overallCPU, _ := cpu.Percent(time.Second, false)
+		overallUtilization := roundToTwoDecimal(overallCPU[0])
+
 		memoryInfo, _ := mem.VirtualMemory()
 		diskUsage, _ := disk.Usage("/")
 		uptime, _ := host.Uptime()
 
 		systemInfo := map[string]interface{}{
-			"cpu_utilization": cpuPercent[0],
-			"cpu_count":       cpuCount,
+			"cpu_utilization":     cpuUtilization,
+			"overall_utilization": overallUtilization,
+			"cpu_count":           cpuCount,
 			"memory_info": map[string]interface{}{
 				"total":     memoryInfo.Total,
 				"used":      memoryInfo.Used,
 				"available": memoryInfo.Available,
-				"percent":   memoryInfo.UsedPercent,
+				"percent":   roundToTwoDecimal(memoryInfo.UsedPercent),
 			},
 			"disk_usage": map[string]interface{}{
 				"total":   diskUsage.Total,
 				"used":    diskUsage.Used,
 				"free":    diskUsage.Free,
-				"percent": diskUsage.UsedPercent,
+				"percent": roundToTwoDecimal(diskUsage.UsedPercent),
 			},
 			"uptime": uptime,
 		}
