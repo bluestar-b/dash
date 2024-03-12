@@ -18,7 +18,8 @@ function useData(): SystemInfo | null {
   const [data, setData] = useState<SystemInfo | null>(null)
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4480/ws")
+    const ws = new WebSocket(`ws://${window.location.hostname}:4480/ws`)
+
 
     ws.onopen = () => {
       console.log("Connected to WebSocket")
