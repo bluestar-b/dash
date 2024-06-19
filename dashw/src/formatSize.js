@@ -1,4 +1,4 @@
-export const formatSize = (size: number) => {
+export const formatSize = (size) => {
   if (size < 1024) return `${size} B`
   const units = ["B", "KB", "MB", "GB", "TB"]
   let unitIndex = 0
