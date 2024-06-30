@@ -9,7 +9,7 @@ const CpuCores = ({ cpuData }) => {
               className="flex p-2 flex-col w-fit items-center justify-center text-center text-xs font-bold border-2 shadow-md border-black dark:border-white rounded-lg"
               style={{
                 flex: "0 0 auto",
-                aspectRatio: "1 / 1"
+                aspectRatio: "1 / 1",
               }}
             >
               <div>{`CPU-${core.number}`}</div>

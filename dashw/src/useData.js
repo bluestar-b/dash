@@ -4,16 +4,15 @@ function useData() {
   const [data, setData] = useState(null)
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://${window.location.hostname}:4480/`)
+    const ws = new WebSocket(`wss://dash_api.notmycode.dev/`)
 
     ws.onopen = () => {
       console.log("Connected to WebSocket")
     }
 
-    ws.onmessage = event => {
+    ws.onmessage = (event) => {
       const message = JSON.parse(event.data)
       setData(message)
-      console.log(event.data)
     }
 
     return () => {
