@@ -31,6 +31,7 @@ func roundToTwoDecimal(num float64) float64 {
 func handleSystemInfo(conn *websocket.Conn) {
 	defer conn.Close()
 	cpuCount, _ := cpu.Counts(true)
+	cpuCountLogical, _ := cpu.Counts(false)
 	for {
 		cpuPercent, _ := cpu.Percent(time.Second, true) // change to true to get per core CPU usage
 		cpuUtilization := make([]map[string]interface{}, len(cpuPercent))
@@ -100,10 +101,11 @@ func handleSystemInfo(conn *websocket.Conn) {
 			},
 			"cpu_utilization":     cpuUtilization,
 			"overall_utilization": overallUtilization,
-			"cpu_count":           cpuCount,
+			"cpu_count_logical":   cpuCount,
+			"cpu_count_physical":  cpuCountLogical,
 			"memory_usage": map[string]interface{}{
 				"total":   memoryInfo.Total,
-				"used":    "i shoot myself bye",
+				"used":    memoryInfo.Total - memoryInfo.Available,
 				"free":    memoryInfo.Available,
 				"percent": roundToTwoDecimal(memoryInfo.UsedPercent),
 			},
