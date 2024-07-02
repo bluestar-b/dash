@@ -137,8 +137,11 @@ const App = () => {
           <div className="p-4">
             <h1 className="text-lg font-bold">Processes</h1>
             <h2 className="font-bold text-md">
-              {sortedProcesses.length} Running Procs.{" "}
+              {data.host.process_count} Running Procs.{" "}
             </h2>
+            <p className="text-xs font-bold">
+              Showing process that use cpu more than 0.1%
+            </p>
           </div>
 
           <div className="shadow-md rounded my-6">

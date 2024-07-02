@@ -33,7 +33,7 @@ func handleSystemInfo(conn *websocket.Conn) {
 	cpuCount, _ := cpu.Counts(true)
 	cpuCountLogical, _ := cpu.Counts(false)
 	for {
-		cpuPercent, _ := cpu.Percent(time.Second, true) // change to true to get per core CPU usage
+		cpuPercent, _ := cpu.Percent(time.Second, true)
 		cpuUtilization := make([]map[string]interface{}, len(cpuPercent))
 		for i, val := range cpuPercent {
 			cpuUtilization[i] = map[string]interface{}{
@@ -47,13 +47,8 @@ func handleSystemInfo(conn *websocket.Conn) {
 		memoryInfo, _ := mem.VirtualMemory()
 		diskUsage, _ := disk.Usage("/")
 		cpu_info, _ := cpu.Info()
-		//fmt.Println(cpu_info)
-
 		hostInfo, _ := host.Info()
-		//fmt.Printf("Host Info: %+v\n", hostInfo)
-
 		netIO, _ := net.IOCounters(false)
-		//fmt.Printf("Network IO: %+v\n", netIO)
 
 		// Get process list
 		processes, err := process.Processes()
@@ -62,18 +57,19 @@ func handleSystemInfo(conn *websocket.Conn) {
 			return
 		}
 
-		processList := make([]map[string]interface{}, len(processes))
-		for i, proc := range processes {
-			// Get process details
+		processList := make([]map[string]interface{}, 0) // Use slice instead of len(processes)
+		for _, proc := range processes {
 			name, _ := proc.Name()
 			pid := proc.Pid
 			cpuPercent, _ := proc.CPUPercent()
 
-			// Add process details to the list
-			processList[i] = map[string]interface{}{
-				"pid":         pid,
-				"name":        name,
-				"cpu_percent": cpuPercent,
+			// add process to the list only if CPU percent > 0.1
+			if cpuPercent > 0.1 {
+				processList = append(processList, map[string]interface{}{
+					"pid":         pid,
+					"name":        name,
+					"cpu_percent": cpuPercent,
+				})
 			}
 		}
 
@@ -89,10 +85,11 @@ func handleSystemInfo(conn *websocket.Conn) {
 				"dropout":      netIO[0].Dropout,
 			},
 			"host": map[string]interface{}{
-				"hostname":  hostInfo.Hostname,
-				"uptime":    hostInfo.Uptime,
-				"boot_time": hostInfo.BootTime,
-				"platform":  hostInfo.Platform,
+				"hostname":      hostInfo.Hostname,
+				"uptime":        hostInfo.Uptime,
+				"boot_time":     hostInfo.BootTime,
+				"platform":      hostInfo.Platform,
+				"process_count": len(processes),
 			},
 			"cpu_info": map[string]interface{}{
 				"name":      cpu_info[0].ModelName,
