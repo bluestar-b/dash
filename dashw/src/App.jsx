@@ -45,10 +45,16 @@ const App = () => {
               label="CPU Speed"
               value={`${data.cpu_info.speed_mhz / 1000} GHz`}
             />
-
-            <div className=" h-52 overflow-y-auto">
-              <CpuCores cpuData={data} />
-            </div>
+            <ServerInfo
+              label={"Cpu utilization"}
+              value={
+                <>
+                  <div className="h-48 overflow-y-auto">
+                    <CpuCores cpuData={data} />
+                  </div>
+                </>
+              }
+            />
           </div>
 
           {/* Memory Section */}
